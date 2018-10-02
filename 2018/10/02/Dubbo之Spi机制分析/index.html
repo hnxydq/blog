@@ -108,21 +108,21 @@
 
 
 
-  <meta name="description" content="一、Dubbo内核Dubbo内核主要包含SPI、AOP、IOC、Compiler。 二、JDK的SPI1.spi的设计目标：  面向对象的设计里，模块之间是基于接口编程，模块质检不对实现类进行硬编码。一旦代码里涉及具体的实现类，就违反了可插拔的原则，如果需要替换一种实现，就需要修改代码。为了实现在模块装配的时候，不在模块里写死代码，就需要一种服务发现机制。Java SPI就提供了这样一种机制：为某">
+  <meta name="description" content="一、Dubbo内核Dubbo内核主要包含SPI、AOP、IOC、Compiler。 二、JDK的SPI1.spi的设计目标：  面向对象的设计里，模块之间是基于接口编程，模块之间不对实现类进行硬编码。一旦代码里涉及具体的实现类，就违反了可插拔的原则，如果需要替换一种实现，就需要修改代码。为了实现在模块装配的时候，不在模块里写死代码，就需要一种服务发现机制。Java SPI就提供了这样一种机制：为某">
 <meta name="keywords" content="源码分析">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Dubbo之Spi机制分析">
 <meta property="og:url" content="https://hnxydq.github.io/2018/10/02/Dubbo之Spi机制分析/index.html">
 <meta property="og:site_name" content="闲来偶记">
-<meta property="og:description" content="一、Dubbo内核Dubbo内核主要包含SPI、AOP、IOC、Compiler。 二、JDK的SPI1.spi的设计目标：  面向对象的设计里，模块之间是基于接口编程，模块质检不对实现类进行硬编码。一旦代码里涉及具体的实现类，就违反了可插拔的原则，如果需要替换一种实现，就需要修改代码。为了实现在模块装配的时候，不在模块里写死代码，就需要一种服务发现机制。Java SPI就提供了这样一种机制：为某">
+<meta property="og:description" content="一、Dubbo内核Dubbo内核主要包含SPI、AOP、IOC、Compiler。 二、JDK的SPI1.spi的设计目标：  面向对象的设计里，模块之间是基于接口编程，模块之间不对实现类进行硬编码。一旦代码里涉及具体的实现类，就违反了可插拔的原则，如果需要替换一种实现，就需要修改代码。为了实现在模块装配的时候，不在模块里写死代码，就需要一种服务发现机制。Java SPI就提供了这样一种机制：为某">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://hnxydq.github.io/2018/10/02/Dubbo之Spi机制分析/spi_1.PNG">
 <meta property="og:image" content="https://hnxydq.github.io/2018/10/02/Dubbo之Spi机制分析/get_extension_1.PNG">
 <meta property="og:image" content="https://hnxydq.github.io/2018/10/02/Dubbo之Spi机制分析/getextension_2.PNG">
-<meta property="og:updated_time" content="2018-10-02T09:10:48.043Z">
+<meta property="og:updated_time" content="2018-10-02T09:27:17.496Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Dubbo之Spi机制分析">
-<meta name="twitter:description" content="一、Dubbo内核Dubbo内核主要包含SPI、AOP、IOC、Compiler。 二、JDK的SPI1.spi的设计目标：  面向对象的设计里，模块之间是基于接口编程，模块质检不对实现类进行硬编码。一旦代码里涉及具体的实现类，就违反了可插拔的原则，如果需要替换一种实现，就需要修改代码。为了实现在模块装配的时候，不在模块里写死代码，就需要一种服务发现机制。Java SPI就提供了这样一种机制：为某">
+<meta name="twitter:description" content="一、Dubbo内核Dubbo内核主要包含SPI、AOP、IOC、Compiler。 二、JDK的SPI1.spi的设计目标：  面向对象的设计里，模块之间是基于接口编程，模块之间不对实现类进行硬编码。一旦代码里涉及具体的实现类，就违反了可插拔的原则，如果需要替换一种实现，就需要修改代码。为了实现在模块装配的时候，不在模块里写死代码，就需要一种服务发现机制。Java SPI就提供了这样一种机制：为某">
 <meta name="twitter:image" content="https://hnxydq.github.io/2018/10/02/Dubbo之Spi机制分析/spi_1.PNG">
 
 
@@ -384,7 +384,7 @@
                 
               
 
-              <time title="创建时间：2018-10-02 16:47:38 / 修改时间：17:10:48" itemprop="dateCreated datePublished" datetime="2018-10-02T16:47:38+08:00">2018-10-02</time>
+              <time title="创建时间：2018-10-02 16:47:38 / 修改时间：17:27:17" itemprop="dateCreated datePublished" datetime="2018-10-02T16:47:38+08:00">2018-10-02</time>
             
 
             
@@ -450,7 +450,7 @@
       
         <h3 id="一、Dubbo内核"><a href="#一、Dubbo内核" class="headerlink" title="一、Dubbo内核"></a>一、Dubbo内核</h3><p>Dubbo内核主要包含SPI、AOP、IOC、Compiler。</p>
 <h3 id="二、JDK的SPI"><a href="#二、JDK的SPI" class="headerlink" title="二、JDK的SPI"></a>二、JDK的SPI</h3><p>1.spi的设计目标： </p>
-<p>面向对象的设计里，模块之间是基于接口编程，模块质检不对实现类进行硬编码。一旦代码里涉及具体的实现类，就违反了可插拔的原则，如果需要替换一种实现，就需要修改代码。为了实现在模块装配的时候，不在模块里写死代码，就需要一种服务发现机制。Java SPI就提供了这样一种机制：为某个接口寻找服务实现，有点类似IOC思想，将装配的控制权移到代码之外。</p>
+<p>面向对象的设计里，模块之间是基于接口编程，模块之间不对实现类进行硬编码。一旦代码里涉及具体的实现类，就违反了可插拔的原则，如果需要替换一种实现，就需要修改代码。为了实现在模块装配的时候，不在模块里写死代码，就需要一种服务发现机制。Java SPI就提供了这样一种机制：为某个接口寻找服务实现，有点类似IOC思想，将装配的控制权移到代码之外。</p>
 <p>2.JDK的SPI的默认约定</p>
 <p>当服务的提供者提供了一个接口的多种实现时，一般会在jar包的META-INF/services目录下，创建该接口的同名文件，文件的内容就是该服务接口的具体实现类的全类名。</p>
 <h3 id="三、Dubbo为什么不采用JDK的SPI"><a href="#三、Dubbo为什么不采用JDK的SPI" class="headerlink" title="三、Dubbo为什么不采用JDK的SPI"></a>三、Dubbo为什么不采用JDK的SPI</h3><p>JDK标准的SPI会一次性实例化扩展点所有实现，如果有扩展实现初始化很耗时。但如果没用上也加载，会很浪费资源。针对这个问题，Dubbo增加了对扩展点IoC和AOP的支持，一个扩展点可以直接setter注入其它扩展点。</p>
