@@ -3,12 +3,22 @@
 
     <sitemap>
         <loc>https://hnxydq.github.io/post-sitemap.xml</loc>
-        <lastmod>2018-10-02T03:46:34.379Z</lastmod>
+        <lastmod>2018-10-02T09:10:48.043Z</lastmod>
     </sitemap>
 
     <sitemap>
         <loc>https://hnxydq.github.io/page-sitemap.xml</loc>
-        <lastmod>2018-10-02T05:51:53.266Z</lastmod>
+        <lastmod>2018-10-02T08:39:27.173Z</lastmod>
+    </sitemap>
+
+    <sitemap>
+        <loc>https://hnxydq.github.io/category-sitemap.xml</loc>
+        <lastmod>2018-10-02T09:10:48.043Z</lastmod>
+    </sitemap>
+
+    <sitemap>
+        <loc>https://hnxydq.github.io/tag-sitemap.xml</loc>
+        <lastmod>2018-10-02T09:10:48.043Z</lastmod>
     </sitemap>
 
 </sitemapindex>
