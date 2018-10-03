@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="序修改dubbo-demo子项目的dubbo-demo-provider模块的main/resources/dubbo-demo-provider.xml中注册中心的配置： 123&amp;lt;!-- 使用multicast广播注册中心暴露服务地址 --&amp;gt;&amp;lt;!--&amp;lt;dubbo:registry address=&quot;multicast://224.5.6.7:1234&quot;/&amp;gt;--&amp;gt">
+<meta name="keywords" content="源码分析">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Dubbo服务发布原理">
+<meta property="og:url" content="https://hnxydq.github.io/2018/10/03/Dubbo服务发布原理/index.html">
+<meta property="og:site_name" content="闲来偶记">
+<meta property="og:description" content="序修改dubbo-demo子项目的dubbo-demo-provider模块的main/resources/dubbo-demo-provider.xml中注册中心的配置： 123&amp;lt;!-- 使用multicast广播注册中心暴露服务地址 --&amp;gt;&amp;lt;!--&amp;lt;dubbo:registry address=&quot;multicast://224.5.6.7:1234&quot;/&amp;gt;--&amp;gt">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://hnxydq.github.io/2018/10/03/Dubbo服务发布原理/demo-provider.PNG">
+<meta property="og:image" content="https://hnxydq.github.io/2018/10/03/Dubbo服务发布原理/export.PNG">
+<meta property="og:updated_time" content="2018-10-03T13:48:55.159Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Dubbo服务发布原理">
+<meta name="twitter:description" content="序修改dubbo-demo子项目的dubbo-demo-provider模块的main/resources/dubbo-demo-provider.xml中注册中心的配置： 123&amp;lt;!-- 使用multicast广播注册中心暴露服务地址 --&amp;gt;&amp;lt;!--&amp;lt;dubbo:registry address=&quot;multicast://224.5.6.7:1234&quot;/&amp;gt;--&amp;gt">
+<meta name="twitter:image" content="https://hnxydq.github.io/2018/10/03/Dubbo服务发布原理/demo-provider.PNG">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="闲来偶记" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="https://hnxydq.github.io/2018/10/03/Dubbo服务发布原理/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Dubbo服务发布原理 | 闲来偶记</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">闲来偶记</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分类</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />关于</a>
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://hnxydq.github.io/2018/10/03/Dubbo服务发布原理/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="hnxydq">
+      <meta itemprop="description" content="Nothing lasts forever">
+      <meta itemprop="image" content="/images/logo.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="闲来偶记">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">Dubbo服务发布原理
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-10-03 21:45:52 / 修改时间：21:48:55" itemprop="dateCreated datePublished" datetime="2018-10-03T21:45:52+08:00">2018-10-03</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Dubbo/" itemprop="url" rel="index"><span itemprop="name">Dubbo</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             阅读次数： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="序"><a href="#序" class="headerlink" title="序"></a>序</h3><p>修改dubbo-demo子项目的dubbo-demo-provider模块的main/resources/dubbo-demo-provider.xml中注册中心的配置：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 使用multicast广播注册中心暴露服务地址 --&gt;</span></span><br><span class="line"><span class="comment">&lt;!--&lt;dubbo:registry address="multicast://224.5.6.7:1234"/&gt;--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dubbo:registry</span> <span class="attr">protocol</span>=<span class="string">"zookeeper"</span> <span class="attr">address</span>=<span class="string">"127.0.0.1:2181"</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+<p>同时修改dubbo-demo子项目的dubbo-demo-provider模块的test/resources/dubbo.properties文件中：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#dubbo.registry.address=multicast://224.5.6.7:1234</span><br><span class="line">dubbo.registry.address=zookeeper://127.0.0.1:2181</span><br></pre></td></tr></table></figure>
+<p>需要外部下载启动zookeeper组件。</p>
+<p>然后启动dubbo-demo-provider/test/java下的DemoProvider观察服务启动日志：</p>
+<p><img src="/2018/10/03/Dubbo服务发布原理/demo-provider.PNG" alt="demo-provider"></p>
+<p>从Provider启动日志可以看到，主要做了6个发布动作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">1.暴露本地服务</span><br><span class="line">2.暴露远程服务</span><br><span class="line">3.启动Netty</span><br><span class="line">4.打开连接Zookeeper</span><br><span class="line">5.到zookeeper注册</span><br><span class="line">6.监听zookeeper</span><br></pre></td></tr></table></figure>
+<p>暴露的服务，其实就是dubbo-demo-provider.xml中配置的service：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 和本地bean一样实现服务 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dubbo:service</span> <span class="attr">interface</span>=<span class="string">"com.alibaba.dubbo.demo.DemoService"</span> <span class="attr">ref</span>=<span class="string">"demoService"</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+<p>dubbo:service是在dubbo-config-spring下resources/META-INF下的dubbo.xsd约束schema文件中定义的。</p>
+<p>而处理Handler在dubbo-config-spring下的schema包下的DubboNamespaceHandler.java中处理：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DubboNamespaceHandler</span> <span class="keyword">extends</span> <span class="title">NamespaceHandlerSupport</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        Version.checkDuplicate(DubboNamespaceHandler.class);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        registerBeanDefinitionParser(<span class="string">"application"</span>, <span class="keyword">new</span> DubboBeanDefinitionParser(ApplicationConfig.class, <span class="keyword">true</span>));</span><br><span class="line">        registerBeanDefinitionParser(<span class="string">"module"</span>, <span class="keyword">new</span> DubboBeanDefinitionParser(ModuleConfig.class, <span class="keyword">true</span>));</span><br><span class="line">        registerBeanDefinitionParser(<span class="string">"registry"</span>, <span class="keyword">new</span> DubboBeanDefinitionParser(RegistryConfig.class, <span class="keyword">true</span>));</span><br><span class="line">        registerBeanDefinitionParser(<span class="string">"monitor"</span>, <span class="keyword">new</span> DubboBeanDefinitionParser(MonitorConfig.class, <span class="keyword">true</span>));</span><br><span class="line">        registerBeanDefinitionParser(<span class="string">"provider"</span>, <span class="keyword">new</span> DubboBeanDefinitionParser(ProviderConfig.class, <span class="keyword">true</span>));</span><br><span class="line">        registerBeanDefinitionParser(<span class="string">"consumer"</span>, <span class="keyword">new</span> DubboBeanDefinitionParser(ConsumerConfig.class, <span class="keyword">true</span>));</span><br><span class="line">        registerBeanDefinitionParser(<span class="string">"protocol"</span>, <span class="keyword">new</span> DubboBeanDefinitionParser(ProtocolConfig.class, <span class="keyword">true</span>));</span><br><span class="line">        registerBeanDefinitionParser(<span class="string">"service"</span>, <span class="keyword">new</span> DubboBeanDefinitionParser(ServiceBean.class, <span class="keyword">true</span>));</span><br><span class="line">        registerBeanDefinitionParser(<span class="string">"reference"</span>, <span class="keyword">new</span> DubboBeanDefinitionParser(ReferenceBean.class, <span class="keyword">false</span>));</span><br><span class="line">        registerBeanDefinitionParser(<span class="string">"annotation"</span>, <span class="keyword">new</span> DubboBeanDefinitionParser(AnnotationBean.class, <span class="keyword">true</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到，service标签对应的Bean为ServiceBean。看看ServiceBean类继承关系：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ServiceBean</span>&lt;<span class="title">T</span>&gt; <span class="keyword">extends</span> <span class="title">ServiceConfig</span>&lt;<span class="title">T</span>&gt; <span class="keyword">implements</span> <span class="title">InitializingBean</span>, <span class="title">DisposableBean</span>, <span class="title">ApplicationContextAware</span>, <span class="title">ApplicationListener</span>, <span class="title">BeanNameAware</span></span></span><br></pre></td></tr></table></figure>
+<p>这里ServiceBean继承自ServiceConfig，并且实现了Spring框架的ApplicationListener接口。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">ApplicationListener</span>&lt;<span class="title">E</span> <span class="keyword">extends</span> <span class="title">ApplicationEvent</span>&gt; <span class="keyword">extends</span> <span class="title">EventListener</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">onApplicationEvent</span><span class="params">(E var1)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>所以在Spring框架启动时，会去回调执行ServiceBean的onApplicationEvent(e)方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onApplicationEvent</span><span class="params">(ApplicationEvent event)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (ContextRefreshedEvent.class.getName().equals(event.getClass().getName())) &#123;</span><br><span class="line">            <span class="keyword">if</span> (isDelay() &amp;&amp; !isExported() &amp;&amp; !isUnexported()) &#123;</span><br><span class="line">                <span class="keyword">if</span> (logger.isInfoEnabled()) &#123;</span><br><span class="line">                    logger.info(<span class="string">"The service ready on spring started. service: "</span> + getInterface());</span><br><span class="line">                &#125;</span><br><span class="line">                export();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>执行调用分析如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ServiceBean.onApplicationEvent</span><br><span class="line">--&gt;export()</span><br><span class="line">  --&gt;ServiceConfig.export()</span><br><span class="line">    --&gt;doExport()</span><br><span class="line">      --&gt;doExportUrls()<span class="comment">//里面有一个for循环，代表了一个服务可以有多个通信协议，例如 tcp协议 http协议，默认是tcp协议</span></span><br><span class="line">        --&gt;loadRegistries(<span class="keyword">true</span>)<span class="comment">//从dubbo.properties里面组装registry的url信息：registry://127.0.0.1:2181/com.alibaba.dubbo.registry.RegistryService?application=demo-provider&amp;dubbo=2.0.0&amp;owner=william&amp;pid=2752&amp;registry=zookeeper&amp;timestamp=1519438717974</span></span><br><span class="line">        --&gt;doExportUrlsFor1Protocol(ProtocolConfig protocolConfig, List&lt;URL&gt; registryURLs)</span><br></pre></td></tr></table></figure>
+<p>这里分为本地暴露和远程暴露。那么暴露本地服务和暴露远程服务的区别是什么？</p>
+<p>1.暴露本地服务：指暴露在用一个JVM里面，不用通过调用zk来进行远程通信。例如：在同一个服务，自己调用自己的接口，就没必要进行网络IP连接来通信。</p>
+<p>2.暴露远程服务：指暴露给远程客户端的IP和端口号，通过网络来实现通信。</p>
+<h3 id="本地暴露"><a href="#本地暴露" class="headerlink" title="本地暴露"></a>本地暴露</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//配置不是remote的情况下做本地暴露 (配置为remote，则表示只暴露远程服务)</span></span><br><span class="line">          --&gt;exportLocal(URL url) <span class="comment">//本地暴露</span></span><br><span class="line">            --&gt;proxyFactory.getInvoker(ref, (Class) interfaceClass, local)</span><br><span class="line">              --&gt;ExtensionLoader.getExtensionLoader(com.alibaba.dubbo.rpc.ProxyFactory.class).getExtension(<span class="string">"javassist"</span>);</span><br><span class="line">              --&gt;extension.getInvoker(arg0, arg1, arg2)</span><br><span class="line">                --&gt;StubProxyFactoryWrapper.getInvoker(T proxy, Class&lt;T&gt; type, URL url) </span><br><span class="line">                  --&gt;proxyFactory.getInvoker(proxy, type, url)</span><br><span class="line">                    --&gt;JavassistProxyFactory.getInvoker(T proxy, Class&lt;T&gt; type, URL url)</span><br><span class="line">                      --&gt;Wrapper.getWrapper(com.alibaba.dubbo.demo.provider.DemoServiceImpl)</span><br><span class="line">                        --&gt;makeWrapper(Class&lt;?&gt; c)</span><br><span class="line">                      --&gt;<span class="keyword">return</span> <span class="keyword">new</span> AbstractProxyInvoker&lt;T&gt;(proxy, type, url)</span><br><span class="line">            --&gt;protocol.export(Invoker&lt;T&gt; invoker)</span><br><span class="line">              --&gt;Protocol$Adpative.export(Invoker&lt;T&gt; invoker)</span><br><span class="line">                --&gt;ExtensionLoader.getExtensionLoader(com.alibaba.dubbo.rpc.Protocol.class).getExtension(<span class="string">"injvm"</span>);</span><br><span class="line">                --&gt;extension.export(arg0) <span class="comment">//extension为ProtocolFilterWrapper</span></span><br><span class="line">                  --&gt;ProtocolFilterWrapper.export(Invoker&lt;T&gt; invoker)</span><br><span class="line">                    --&gt;ProtocolFilterWrapper.buildInvokerChain(<span class="keyword">final</span> Invoker&lt;T&gt; invoker, String key, String group) <span class="comment">//创建8个filter</span></span><br><span class="line">                    --&gt;ProtocolListenerWrapper.export(Invoker&lt;T&gt; invoker)</span><br><span class="line">                      --&gt;InjvmProtocol.export(Invoker&lt;T&gt; invoker)</span><br><span class="line">                        --&gt;<span class="keyword">return</span> <span class="keyword">new</span> InjvmExporter&lt;T&gt;(invoker, invoker.getUrl().getServiceKey(), exporterMap)</span><br><span class="line">							--&gt;exporterMap.put(key, <span class="keyword">this</span>)<span class="comment">//key=com.alibaba.dubbo.demo.DemoService, this=InjvmExporter //这里也是上面整个代码的目的，为了把要暴露的对象存储在exporterMap里</span></span><br></pre></td></tr></table></figure>
+<p>（1）这里的proxyFactory是什么？</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SPI</span>(<span class="string">"javassist"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">ProxyFactory</span> </span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * create proxy.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> invoker</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> proxy</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Adaptive</span>(&#123;Constants.PROXY_KEY&#125;)</span><br><span class="line">    &lt;T&gt; <span class="function">T <span class="title">getProxy</span><span class="params">(Invoker&lt;T&gt; invoker)</span> <span class="keyword">throws</span> RpcException</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * create invoker.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> &lt;T&gt;</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> proxy</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> type</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> url</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> invoker</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Adaptive</span>(&#123;Constants.PROXY_KEY&#125;)</span><br><span class="line">    &lt;T&gt; <span class="function">Invoker&lt;T&gt; <span class="title">getInvoker</span><span class="params">(T proxy, Class&lt;T&gt; type, URL url)</span> <span class="keyword">throws</span> RpcException</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看出proxyFactory是一个代理，作用是获取一个接口的代理类，例如获取一个远程接口的代理。</p>
+<p> getInvoker：针对server端，将服务对象，如DemoServiceImpl包装成一个Invoker对象。</p>
+<p> getProxy：针对client端，创建接口的代理对象，例如DemoService的接口。</p>
+<p>（2）上面还出现了Wrapper，这个又是做什么的？</p>
+<p>它类似spring的BeanWrapper，它就是包装了一个接口或一个类，可以通过wrapper对实例对象进行赋值、取值以及指定方法的调用。</p>
+<p>（3）Invoker</p>
+<p>Invoker：它是一个可执行的对象，能够根据方法的名称、参数得到相应的执行结果。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">它里面有一个很重要的方法 <span class="function">Result <span class="title">invoke</span><span class="params">(Invocation invocation)</span>，</span></span><br><span class="line"><span class="function">Invocation是包含了需要执行的方法和参数等重要信息，目前它只有2个实现类RpcInvocation MockInvocation</span></span><br><span class="line"><span class="function">它有3种类型的Invoker</span></span><br><span class="line"><span class="function">	1.本地执行类的Invoker</span></span><br><span class="line"><span class="function">		server端：要执行 demoService.sayHello，就通过InjvmExporter来进行反射执行demoService.sayHello就可以了。</span></span><br><span class="line"><span class="function">		</span></span><br><span class="line"><span class="function">	2.远程通信类的Invoker</span></span><br><span class="line"><span class="function">		client端：要执行 demoService.sayHello，它封装了DubboInvoker进行远程通信，发送要执行的接口给server端。</span></span><br><span class="line"><span class="function">		server端：采用了AbstractProxyInvoker执行了DemoServiceImpl.sayHello,然后将执行结果返回发送给client.</span></span><br><span class="line"><span class="function">		</span></span><br><span class="line"><span class="function">	3.多个远程通信执行类的Invoker聚合成集群版的Invoker</span></span><br><span class="line"><span class="function">		client端：要执行 demoService.sayHello，就要通过AbstractClusterInvoker来进行负载均衡，DubboInvoker进行远程通信，发送要执行的接口给server端。</span></span><br><span class="line"><span class="function">		server端：采用了AbstractProxyInvoker执行了DemoServiceImpl.sayHello,然后将执行结果返回发送给client.</span></span><br></pre></td></tr></table></figure>
+<h3 id="远程暴露"><a href="#远程暴露" class="headerlink" title="远程暴露"></a>远程暴露</h3><p>远程暴露过程中使用Netty进行通信。接着前面分析：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//如果配置不是local则暴露为远程服务.(配置为local，则表示只暴露本地服务)</span></span><br><span class="line">          --&gt;proxyFactory.getInvoker<span class="comment">//原理和本地暴露一样都是为了获取一个Invoker对象</span></span><br><span class="line">          --&gt;protocol.export(invoker) <span class="comment">//invoker: "registry://127.0.0.1:2181/com.alibaba.dubbo.registry.RegistryService?application=demo-provider&amp;dubbo=2.0.0&amp;export=dubbo%3A%2F%2F10.168.18.162%3A20880%2Fcom.alibaba.dubbo.demo.DemoService%3Fanyhost%3Dtrue%26application%3Ddemo-provider%26dubbo%3D2.0.0%26generic%3Dfalse%26interface%3Dcom.alibaba.dubbo.demo.DemoService%26loadbalance%3Droundrobin%26methods%3DsayHello%26owner%3Dwilliam%26pid%3D6948%26side%3Dprovider%26timestamp%3D1519691944112&amp;owner=william&amp;pid=6948&amp;registry=zookeeper&amp;timestamp=1519691944048"</span></span><br><span class="line">            --&gt;Protocol$Adpative.export(invoker)</span><br><span class="line">              --&gt;ExtensionLoader.getExtensionLoader(com.alibaba.dubbo.rpc.Protocol.class).getExtension(<span class="string">"registry"</span>);</span><br><span class="line">	            --&gt;extension.export(arg0)</span><br><span class="line">	              --&gt;ProtocolFilterWrapper.export(Invoker&lt;T&gt; invoker)</span><br><span class="line">	                --&gt;ProtocolListenerWrapper.export(Invoker&lt;T&gt; invoker)</span><br><span class="line">	                  --&gt;RegistryProtocol.export(<span class="keyword">final</span> Invoker&lt;T&gt; originInvoker)</span><br><span class="line">	                    --&gt;doLocalExport(<span class="keyword">final</span> Invoker&lt;T&gt; originInvoker)</span><br><span class="line">	                      --&gt;getCacheKey(originInvoker);<span class="comment">//读取 dubbo://127.0.0.1:20880/</span></span><br><span class="line">	                      --&gt;protocol.export(invokerDelegete)</span><br><span class="line">	                        --&gt;Protocol$Adpative.export(com.alibaba.dubbo.rpc.Invoker arg0)</span><br><span class="line">	                          --&gt;ExtensionLoader.getExtensionLoader(com.alibaba.dubbo.rpc.Protocol.class).getExtension(<span class="string">"dubbo"</span>);</span><br><span class="line">	                          --&gt;extension.export(arg0)</span><br><span class="line">	                            --&gt;ProtocolFilterWrapper.export(Invoker&lt;T&gt; invoker)</span><br><span class="line">	                              --&gt;buildInvokerChain(invoker, Constants.SERVICE_FILTER_KEY, Constants.PROVIDER)<span class="comment">//创建8个filter</span></span><br><span class="line">	                              --&gt;ProtocolListenerWrapper.export(Invoker&lt;T&gt; invoker)</span><br><span class="line">                                    --&gt;DubboProtocol.export(Invoker&lt;T&gt; invoker)  <span class="comment">//------------1.netty服务暴露的开始</span></span><br><span class="line">	                                  --&gt;serviceKey(url)<span class="comment">//组装key=com.alibaba.dubbo.demo.DemoService:20880</span></span><br><span class="line">	                                  --&gt;目的：exporterMap.put(key, exporter); <span class="comment">//key=com.alibaba.dubbo.demo.DemoService:20880, exporter=DubboExporter</span></span><br><span class="line">	                                  --&gt;openServer(url)</span><br><span class="line">	                                    --&gt;createServer(url)</span><br><span class="line">                                          --&gt;Exchangers.bind(url, requestHandler)<span class="comment">//------------2.信息交换层exchanger开始</span></span><br><span class="line">	                                        --&gt;getExchanger(url)</span><br><span class="line">	                                          --&gt;getExchanger(type)</span><br><span class="line">	                                            --&gt;ExtensionLoader.getExtensionLoader(Exchanger.class).getExtension(<span class="string">"header"</span>)</span><br><span class="line">	                                        --&gt;HeaderExchanger.bind(URL url, ExchangeHandler handler)</span><br><span class="line">	                                          --&gt;Transporters.bind(url, <span class="keyword">new</span> DecodeHandler(<span class="keyword">new</span> HeaderExchangeHandler(handler)))</span><br><span class="line">	                                            --&gt;<span class="keyword">new</span> HeaderExchangeHandler(handler)<span class="comment">//this.handler = handler</span></span><br><span class="line">	                                            --&gt;<span class="keyword">new</span> DecodeHandler</span><br><span class="line">	                                            	--&gt;<span class="keyword">new</span> AbstractChannelHandlerDelegate<span class="comment">//this.handler = handler;</span></span><br><span class="line">                                                --&gt;Transporters.bind(URL url, ChannelHandler... handlers)<span class="comment">//----3.网络传输层 transporter</span></span><br><span class="line">	                                              --&gt;getTransporter()</span><br><span class="line">	                                                --&gt;ExtensionLoader.getExtensionLoader(Transporter.class).getAdaptiveExtension()</span><br><span class="line">	                                              --&gt;Transporter$Adpative.bind</span><br><span class="line">	                                                --&gt;ExtensionLoader.getExtensionLoader(com.alibaba.dubbo.remoting.Transporter.class).getExtension(<span class="string">"netty"</span>);</span><br><span class="line">	                                                --&gt;extension.bind(arg0, arg1)</span><br><span class="line">	                                                  --&gt;NettyTransporter.bind(URL url, ChannelHandler listener)</span><br><span class="line">	                                                    --<span class="keyword">new</span> NettyServer(url, listener)</span><br><span class="line">	                                                      --&gt;AbstractPeer <span class="comment">//this.url = url;    this.handler = handler;</span></span><br><span class="line">	                                                      --&gt;AbstractEndpoint<span class="comment">//codec  timeout=1000  connectTimeout=3000</span></span><br><span class="line">	                                                      --&gt;AbstractServer <span class="comment">//bindAddress accepts=0 idleTimeout=600000</span></span><br><span class="line">                                                          --&gt;doOpen()  <span class="comment">//---------------4.打开连接，暴露netty服务</span></span><br><span class="line">	                                                        --&gt;设置 NioServerSocketChannelFactory boss worker的线程池 线程个数为<span class="number">3</span></span><br><span class="line">	                                                        --&gt;设置编解码 hander</span><br><span class="line">	                                                        --&gt;bootstrap.bind(getBindAddress())</span><br><span class="line">	                                          --&gt;<span class="keyword">new</span> HeaderExchangeServer</span><br><span class="line">	                                            --&gt;<span class="keyword">this</span>.server=NettyServer</span><br><span class="line">	                                            --&gt;heartbeat=<span class="number">60000</span></span><br><span class="line">	                                            --&gt;heartbeatTimeout=<span class="number">180000</span></span><br><span class="line">	                                            --&gt;startHeatbeatTimer()<span class="comment">//这是一个心跳定时器，采用了线程池，如果断开就心跳重连。</span></span><br></pre></td></tr></table></figure>
+<p>①Protocol</p>
+<p>1.export：暴露远程服务（用于服务端），就是将proxyFactory.getInvoker创建的代理类 invoker对象，通过协议暴露给外部。</p>
+<p>2.refer：引用远程服务（用于客户端）， 通过proxyFactory.getProxy来创建远程的动态代理类，例如DemoService的远程动态接口。</p>
+<p>②exporter：维护invoker的生命周期。</p>
+<p>③exchanger：信息交换层，封装请求响应模式，同步转异步。</p>
+<p>④transporter：网络传输层，用来抽象netty和mina的统一接口。</p>
+<p><strong>接着前面Netty分析之后，来分析Dubbo中的Zookeeper使用机制。</strong></p>
+<p>关注如下三个问题：</p>
+<p>①dubbo如何连接zookeeper？</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">         --&gt;getRegistry(originInvoker)<span class="comment">//连接zookeeper</span></span><br><span class="line">           --&gt;registryFactory.getRegistry(registryUrl)</span><br><span class="line">             --&gt;ExtensionLoader.getExtensionLoader(RegistryFactory.class).getExtension(<span class="string">"zookeeper"</span>);</span><br><span class="line">             --&gt;extension.getRegistry(arg0)</span><br><span class="line">               --&gt;AbstractRegistryFactory.getRegistry<span class="comment">//创建一个注册中心，存储在REGISTRIES</span></span><br><span class="line">                 --&gt;createRegistry(url)</span><br><span class="line">                   --&gt;<span class="keyword">new</span> ZookeeperRegistry(url, zookeeperTransporter)</span><br><span class="line">                     --&gt;AbstractRegistry(URL url)</span><br><span class="line">                       --&gt;loadProperties()<span class="comment">//目的：把C:\Users\dongqiang\.dubbo\dubbo-registry-127.0.0.1.cache 文件中的内容加载为properties</span></span><br><span class="line">                       --&gt;notify(url.getBackupUrls())<span class="comment">//不做任何事             </span></span><br><span class="line">                     --&gt;FailbackRegistry   </span><br><span class="line">                       --&gt;retryExecutor.scheduleWithFixedDelay(<span class="keyword">new</span> Runnable()<span class="comment">//建立线程池，检测并连接注册中心,如果失败了就重连</span></span><br><span class="line">                     --&gt;ZookeeperRegistry</span><br><span class="line">                       --&gt;zookeeperTransporter.connect(url)</span><br><span class="line">                         --&gt;ZookeeperTransporter$Adpative.connect(url)</span><br><span class="line">                           --&gt;ExtensionLoader.getExtensionLoader(ZookeeperTransporter.class).getExtension(<span class="string">"zkclient"</span>);</span><br><span class="line">                           --&gt;extension.connect(arg0)</span><br><span class="line">                             --&gt;ZkclientZookeeperTransporter.connect(URL url)</span><br><span class="line">                               --&gt;<span class="keyword">new</span> ZkclientZookeeperClient(url)</span><br><span class="line">                                 --&gt;调用<span class="keyword">super</span>: AbstractZookeeperClient(URL url)</span><br><span class="line">--&gt;<span class="keyword">new</span> ZkClient(url.getBackupAddress());<span class="comment">//连接ZK</span></span><br><span class="line">                                 --&gt;client.subscribeStateChanges(<span class="keyword">new</span> IZkStateListener()<span class="comment">//订阅的目的：连接断开时重连</span></span><br><span class="line">                       --&gt;zkClient.addStateListener(<span class="keyword">new</span> StateListener() </span><br><span class="line">                         --&gt;recover <span class="comment">//连接失败时重连</span></span><br></pre></td></tr></table></figure>
+<p>②dubbo如何创建zookeeper节点？</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">--&gt;registry.register(registedProviderUrl)<span class="comment">//创建节点</span></span><br><span class="line">  --&gt;AbstractRegistry.register</span><br><span class="line">  --&gt;FailbackRegistry.register</span><br><span class="line">    --&gt;doRegister(url)<span class="comment">//向zk服务器端发送注册请求</span></span><br><span class="line">      --&gt;ZookeeperRegistry.doRegister(URL url)</span><br><span class="line">        --&gt;zkClient.create(toUrlPath(url), url.getParameter(Constants.DYNAMIC_KEY, <span class="keyword">true</span>))</span><br><span class="line">          --&gt;AbstractZookeeperClient.create<span class="comment">///dubbo/com.alibaba.dubbo.demo.DemoService/providers/dubbo%3A%2F%2F10.168.18.162%3A20880%2Fcom.alibaba.dubbo.demo.DemoService%3Fanyhost%3Dtrue%26application%3Ddemo-provider%26dubbo%3D2.0.0%26generic%3Dfalse%26interface%3Dcom.alibaba.dubbo.demo.DemoService%26loadbalance%3Droundrobin%26methods%3DsayHello%26owner%3Dwilliam%26pid%3D7832%26side%3Dprovider%26timestamp%3D1519804577146</span></span><br><span class="line">            --&gt;createEphemeral(path);<span class="comment">//临时节点  dubbo%3A%2F%2F10.168.18.162%3A20880%2F.............</span></span><br><span class="line">            --&gt;createPersistent(path);<span class="comment">//持久化节点 dubbo/com.alibaba.dubbo.demo.DemoService/providers</span></span><br></pre></td></tr></table></figure>
+<p>zk持久化节点和临时节点有什么区别？</p>
+<p>持久化节点：一旦被创建，除非主动删除掉，否则就一直存储在zk里面。</p>
+<p>临时节点：与客户端会话绑定，一旦客户端会话失效，这个客户端端所创建的所有临时节点都会被删除。Dubbo对注册的服务使用临时节点，保证服务断掉时节点自动被移除，以免订阅者一直订阅。比如服务端已经挂了，但是在Zk中仍然存在，那么客户端还是会去请求和监听，那么会一直失败。</p>
+<p>③dubbo如何订阅zookeeper信息？</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">                --&gt;registry.subscribe(overrideSubscribeUrl, overrideSubscribeListener);<span class="comment">//订阅ZK</span></span><br><span class="line">                  --&gt;AbstractRegistry.subscribe</span><br><span class="line">                  --&gt;FailbackRegistry.subscribe</span><br><span class="line">                    --&gt;doSubscribe(url, listener)<span class="comment">// 向服务器端发送订阅请求</span></span><br><span class="line">                      --&gt;ZookeeperRegistry.doSubscribe(<span class="keyword">final</span> URL url, <span class="keyword">final</span> NotifyListener listener)</span><br><span class="line">                        --&gt;<span class="keyword">new</span> ChildListener() &#123;</span><br><span class="line">--&gt;实现childChanged(String parentPath, List&lt;String&gt; currentChilds)</span><br><span class="line">   --&gt;实现并执行ZookeeperRegistry.<span class="keyword">this</span>.notify(url, listener, toUrlsWithEmpty(url, parentPath, currentChilds));</span><br><span class="line">                          <span class="comment">//A</span></span><br><span class="line">                        --&gt;zkClient.create(path, <span class="keyword">false</span>);<span class="comment">//第一步：先创建持久化节点/dubbo/com.alibaba.dubbo.demo.DemoService/configurators</span></span><br><span class="line">                        --&gt;zkClient.addChildListener(path, zkListener)</span><br><span class="line">                          --&gt;AbstractZookeeperClient.addChildListener(path, listener)</span><br><span class="line">                            <span class="comment">//C</span></span><br><span class="line">                            --&gt;createTargetChildListener(path, listener)<span class="comment">//第三步：收到订阅后的处理，交给FailbackRegistry.notify处理</span></span><br><span class="line">                              --&gt;ZkclientZookeeperClient.createTargetChildListener(String path, <span class="keyword">final</span> ChildListener listener)</span><br><span class="line">                                --&gt;<span class="keyword">new</span> IZkChildListener() </span><br><span class="line">                                  --&gt;实现了 handleChildChange <span class="comment">//收到订阅后的处理</span></span><br><span class="line">                                  	--&gt;listener.childChanged(parentPath, currentChilds);</span><br><span class="line">                                  	--&gt;实现并执行ZookeeperRegistry.<span class="keyword">this</span>.notify(url, listener, toUrlsWithEmpty(url, parentPath, currentChilds));</span><br><span class="line">                                  	--&gt;收到订阅后处理 FailbackRegistry.notify</span><br><span class="line">                            <span class="comment">//B      	</span></span><br><span class="line">                            --&gt;addTargetChildListener(path, targetListener)<span class="comment">////第二步</span></span><br><span class="line">                              --&gt;ZkclientZookeeperClient.addTargetChildListener</span><br><span class="line">                                --&gt;client.subscribeChildChanges(path, listener)<span class="comment">//第二步：启动加入订阅/dubbo/com.alibaba.dubbo.demo.DemoService/configurators</span></span><br></pre></td></tr></table></figure>
+<p>最后再跟一下notify的处理流程：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">--&gt;notify(url, listener, urls)</span><br><span class="line">  --&gt;FailbackRegistry.notify</span><br><span class="line">    --&gt;doNotify(url, listener, urls);</span><br><span class="line">      --&gt;AbstractRegistry.notify</span><br><span class="line">        --&gt;saveProperties(url);<span class="comment">//把服务端的注册url信息更新到C:\Users\dongqiang\.dubbo\dubbo-registry-192.168.48.117.cache</span></span><br><span class="line">          --&gt;registryCacheExecutor.execute(<span class="keyword">new</span> SaveProperties(version));<span class="comment">//采用线程池来处理</span></span><br><span class="line">        --&gt;listener.notify(categoryList)</span><br><span class="line">          --&gt;RegistryProtocol.notify</span><br><span class="line">            --&gt;RegistryProtocol.<span class="keyword">this</span>.getProviderUrl(originInvoker)<span class="comment">//通过invoker的url 获取 providerUrl的地址</span></span><br></pre></td></tr></table></figure>
+<p>整个服务发布流程如下：</p>
+<p><img src="/2018/10/03/Dubbo服务发布原理/export.PNG" alt="export"></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>hnxydq</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://hnxydq.github.io/2018/10/03/Dubbo服务发布原理/" title="Dubbo服务发布原理">https://hnxydq.github.io/2018/10/03/Dubbo服务发布原理/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/源码分析/" rel="tag"># 源码分析</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/02/Dubbo的动态编译/" rel="next" title="Dubbo的动态编译">
+                <i class="fa fa-chevron-left"></i> Dubbo的动态编译
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/logo.png"
+                alt="hnxydq" />
+            
+              <p class="site-author-name" itemprop="name">hnxydq</p>
+              <p class="site-description motion-element" itemprop="description">Nothing lasts forever</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                    <span class="site-state-item-count">1</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                    <span class="site-state-item-count">1</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/hnxydq" target="_blank" title="GitHub" rel="external nofollow"><i class="fa fa-fw fa-github"></i></a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:hnxydq@hotmail.com" target="_blank" title="E-Mail" rel="external nofollow"><i class="fa fa-fw fa-envelope"></i></a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                友情链接
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://huachen.ml" title="HuaChen" target="_blank">HuaChen</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://xxzizixx.github.io/" title="YangBiao" target="_blank">YangBiao</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#序"><span class="nav-number">1.</span> <span class="nav-text">序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#本地暴露"><span class="nav-number">2.</span> <span class="nav-text">本地暴露</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#远程暴露"><span class="nav-number">3.</span> <span class="nav-text">远程暴露</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">hnxydq</span>
+
+  
+
+  
+</div>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="总访客量">
+      <i class="fa fa-user"></i>&nbsp;访客&nbsp;
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>&nbsp;|&nbsp;
+    </span>
+  
+
+  
+    <span class="site-pv" title="总访问量">
+      <i class="fa fa-eye"></i>&nbsp;访问量&nbsp;
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

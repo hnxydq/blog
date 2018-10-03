@@ -108,17 +108,20 @@
 
 
 
-  <meta name="description" content="董强软件工程师 坐标: 湖北 武汉 Email: hnxydq@hotmail.com">
-<meta property="og:type" content="website">
-<meta property="og:title" content="闲来偶记">
-<meta property="og:url" content="https://hnxydq.github.io/about/index.html">
+  <meta name="description" content="前面分析SPI机制时，提到createAdaptiveExtensionClass()自动生成和编译一个动态的adpative类。 Compiler的类继承关系：  在Dubbo实现中，默认使用JavassistCompiler进行动态编译，不使用JdKComplier。这一点从Compiler接口的实现中可以看出。 123456789101112@SPI(&quot;javassist&quot;)public i">
+<meta name="keywords" content="源码分析">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Dubbo的动态编译">
+<meta property="og:url" content="https://hnxydq.github.io/2018/10/02/Dubbo的动态编译/index.html">
 <meta property="og:site_name" content="闲来偶记">
-<meta property="og:description" content="董强软件工程师 坐标: 湖北 武汉 Email: hnxydq@hotmail.com">
+<meta property="og:description" content="前面分析SPI机制时，提到createAdaptiveExtensionClass()自动生成和编译一个动态的adpative类。 Compiler的类继承关系：  在Dubbo实现中，默认使用JavassistCompiler进行动态编译，不使用JdKComplier。这一点从Compiler接口的实现中可以看出。 123456789101112@SPI(&quot;javassist&quot;)public i">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-10-02T08:39:27.173Z">
+<meta property="og:image" content="https://hnxydq.github.io/2018/10/02/Dubbo的动态编译/compiler_hierarchy.PNG">
+<meta property="og:updated_time" content="2018-10-02T13:33:36.254Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="闲来偶记">
-<meta name="twitter:description" content="董强软件工程师 坐标: 湖北 武汉 Email: hnxydq@hotmail.com">
+<meta name="twitter:title" content="Dubbo的动态编译">
+<meta name="twitter:description" content="前面分析SPI机制时，提到createAdaptiveExtensionClass()自动生成和编译一个动态的adpative类。 Compiler的类继承关系：  在Dubbo实现中，默认使用JavassistCompiler进行动态编译，不使用JdKComplier。这一点从Compiler接口的实现中可以看出。 123456789101112@SPI(&quot;javassist&quot;)public i">
+<meta name="twitter:image" content="https://hnxydq.github.io/2018/10/02/Dubbo的动态编译/compiler_hierarchy.PNG">
 
 
 
@@ -127,7 +130,7 @@
 
 
 
-  <link rel="canonical" href="https://hnxydq.github.io/about/"/>
+  <link rel="canonical" href="https://hnxydq.github.io/2018/10/02/Dubbo的动态编译/"/>
 
 
 
@@ -137,7 +140,7 @@
   };
 </script>
 
-  <title> | 闲来偶记</title>
+  <title>Dubbo的动态编译 | 闲来偶记</title>
   
 
 
@@ -253,7 +256,7 @@
         
         
           
-          <li class="menu-item menu-item-about menu-item-active">
+          <li class="menu-item menu-item-about">
     <a href="/about/" rel="section">
       <i class="menu-item-icon fa fa-fw fa-user"></i> <br />关于</a>
   </li>
@@ -273,28 +276,6 @@
 
   
     
-
-    
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-    
-
-  
-
 
   
 
@@ -345,46 +326,223 @@
 
   <div id="posts" class="posts-expand">
     
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://hnxydq.github.io/2018/10/02/Dubbo的动态编译/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="hnxydq">
+      <meta itemprop="description" content="Nothing lasts forever">
+      <meta itemprop="image" content="/images/logo.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="闲来偶记">
+    </span>
+
     
-    
-    <div class="post-block page">
       <header class="post-header">
 
-<h2 class="post-title" itemprop="name headline"></h2>
-
-<div class="post-meta">
-  
-  
-
-
-
-</div>
-
-</header>
-
-      
-      
-      
-      <div class="post-body">
         
         
-          <h3 id="董强"><a href="#董强" class="headerlink" title="董强"></a>董强</h3><p>软件工程师</p>
-<p>坐标: 湖北 武汉</p>
-<p>Email: <a href="mailto:hnxydq@hotmail.com" target="_blank" rel="noopener">hnxydq@hotmail.com</a></p>
-
+          <h2 class="post-title" itemprop="name headline">Dubbo的动态编译
+              
+            
+          </h2>
         
-      </div>
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-10-02 21:33:20 / 修改时间：21:33:36" itemprop="dateCreated datePublished" datetime="2018-10-02T21:33:20+08:00">2018-10-02</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Dubbo/" itemprop="url" rel="index"><span itemprop="name">Dubbo</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             阅读次数： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
       
       
+
+      
+        <p>前面分析SPI机制时，提到createAdaptiveExtensionClass()自动生成和编译一个动态的adpative类。</p>
+<p>Compiler的类继承关系：</p>
+<p><img src="/2018/10/02/Dubbo的动态编译/compiler_hierarchy.PNG" alt="compiler_hierarchy"></p>
+<p>在Dubbo实现中，默认使用JavassistCompiler进行动态编译，不使用JdKComplier。这一点从Compiler接口的实现中可以看出。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SPI</span>(<span class="string">"javassist"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Compiler</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Compile java source code.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> code        Java source code</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> classLoader TODO</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> Compiled class</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    Class&lt;?&gt; compile(String code, ClassLoader classLoader);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到，这里使用了@SPI注解，指定了使用javassist。</p>
+<p>回顾前面的调用流程：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">--&gt;createAdaptiveExtensionClass()</span><br><span class="line">	--&gt;createAdaptiveExtensionClassCode()</span><br><span class="line">	--&gt;com.alibaba.dubbo.common.compiler.Compiler compiler = ExtensionLoader.getExtensionLoader(com.alibaba.dubbo.common.compiler.Compiler.class).getAdaptiveExtension();</span><br><span class="line">	--&gt;compiler.compile(code, classLoader)</span><br><span class="line">      --&gt;AdaptiveCompiler.compile(code, classLoader)</span><br><span class="line">      	--&gt;AbstractCompiler.compile(code, classLoader) </span><br><span class="line">      		--&gt;Class&lt;?&gt; doCompile(String name, String source)</span><br><span class="line">      			--&gt;JavassistCompiler.doCompile(String name, String source) </span><br><span class="line">      				--&gt;cls.toClass(ClassHelper.getCallerClassLoader(getClass()), JavassistCompiler.class.getProtectionDomain());<span class="comment">//编译成class返回</span></span><br></pre></td></tr></table></figure>
+<p>根据前面分析SPI机制时得出的结论：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">getExtensionLoader(Class&lt;T&gt; type) 就是为该接口new 一个ExtensionLoader，然后缓存起来。</span><br><span class="line">getAdaptiveExtension() 获取一个扩展类，如果@Adaptive注解在类上就是一个装饰类；如果注解在方法上就是一个动态代理类，例如Protocol$Adaptive对象。</span><br><span class="line">getExtension(String name) 获取一个指定对象。</span><br></pre></td></tr></table></figure>
+<p>这里首先为Compiler接口创建了一个ExtensionLoader。然后调用getAdaptiveExtension()获取扩展类。那么这个Compiler是一个装饰类还是一个动态代理类？从上面的Compiler接口的定义并不能看出，跟进compile()方法来看:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Adaptive</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AdaptiveCompiler</span> <span class="keyword">implements</span> <span class="title">Compiler</span></span></span><br></pre></td></tr></table></figure>
+<p>所以Compiler是一个装饰类。</p>
+<p>接着看createAdaptiveExtensionClass()具体实现：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> Class&lt;?&gt; createAdaptiveExtensionClass() &#123;</span><br><span class="line">        String code = createAdaptiveExtensionClassCode();</span><br><span class="line">        ClassLoader classLoader = findClassLoader();</span><br><span class="line">        com.alibaba.dubbo.common.compiler.Compiler compiler = ExtensionLoader.getExtensionLoader(com.alibaba.dubbo.common.compiler.Compiler.class).getAdaptiveExtension();</span><br><span class="line">        <span class="keyword">return</span> compiler.compile(code, classLoader);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里会执行到AdaptiveCompiler的实现：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Adaptive</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AdaptiveCompiler</span> <span class="keyword">implements</span> <span class="title">Compiler</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">volatile</span> String DEFAULT_COMPILER;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">setDefaultCompiler</span><span class="params">(String compiler)</span> </span>&#123;</span><br><span class="line">        DEFAULT_COMPILER = compiler;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> Class&lt;?&gt; compile(String code, ClassLoader classLoader) &#123;</span><br><span class="line">        Compiler compiler;</span><br><span class="line">        ExtensionLoader&lt;Compiler&gt; loader = ExtensionLoader.getExtensionLoader(Compiler.class);</span><br><span class="line">        String name = DEFAULT_COMPILER; <span class="comment">// copy reference</span></span><br><span class="line">        <span class="keyword">if</span> (name != <span class="keyword">null</span> &amp;&amp; name.length() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            compiler = loader.getExtension(name);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            compiler = loader.getDefaultExtension();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> compiler.compile(code, classLoader);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里DEFAULT_COMPILER执行compile时并未赋值，所以会执行else分支，这里最终会根据@SPI(“javassist”)获取JavassistCompiler。然后使用其compile()进行编译code，这里会调用到抽象类AbstractCompiler的实现：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">AbstractCompiler</span> <span class="keyword">implements</span> <span class="title">Compiler</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Pattern PACKAGE_PATTERN = Pattern.compile(<span class="string">"package\\s+([$_a-zA-Z][$_a-zA-Z0-9\\.]*);"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Pattern CLASS_PATTERN = Pattern.compile(<span class="string">"class\\s+([$_a-zA-Z][$_a-zA-Z0-9]*)\\s+"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> Class&lt;?&gt; compile(String code, ClassLoader classLoader) &#123;</span><br><span class="line">        code = code.trim();</span><br><span class="line">        Matcher matcher = PACKAGE_PATTERN.matcher(code);</span><br><span class="line">        String pkg;</span><br><span class="line">        <span class="keyword">if</span> (matcher.find()) &#123;</span><br><span class="line">            pkg = matcher.group(<span class="number">1</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            pkg = <span class="string">""</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        matcher = CLASS_PATTERN.matcher(code);</span><br><span class="line">        String cls;</span><br><span class="line">        <span class="keyword">if</span> (matcher.find()) &#123;</span><br><span class="line">            cls = matcher.group(<span class="number">1</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"No such class name in "</span> + code);</span><br><span class="line">        &#125;</span><br><span class="line">        String className = pkg != <span class="keyword">null</span> &amp;&amp; pkg.length() &gt; <span class="number">0</span> ? pkg + <span class="string">"."</span> + cls : cls;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> Class.forName(className, <span class="keyword">true</span>, ClassHelper.getCallerClassLoader(getClass()));</span><br><span class="line">        &#125; <span class="keyword">catch</span> (ClassNotFoundException e) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!code.endsWith(<span class="string">"&#125;"</span>)) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"The java code not endsWith \"&#125;\", code: \n"</span> + code + <span class="string">"\n"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="keyword">return</span> doCompile(className, code);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (RuntimeException t) &#123;</span><br><span class="line">                <span class="keyword">throw</span> t;</span><br><span class="line">            &#125; <span class="keyword">catch</span> (Throwable t) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"Failed to compile class, cause: "</span> + t.getMessage() + <span class="string">", class: "</span> + className + <span class="string">", code: \n"</span> + code + <span class="string">"\n, stack: "</span> + ClassUtils.toString(t));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">abstract</span> Class&lt;?&gt; doCompile(String name, String source) <span class="keyword">throws</span> Throwable;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在上述代码中首先会去使用类加载器Class.forName去加载目标类，如果类本身（如动态代理类$Adaptive）不存在则会走到异常处理代码，doCompile()这里会调用到JavassistCompiler的具体实现。</p>
+<p>在该类中最后会返回编译的class：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cls.toClass(ClassHelper.getCallerClassLoader(getClass()), JavassistCompiler.class.getProtectionDomain());</span><br></pre></td></tr></table></figure>
+
       
     </div>
-    
-
-
 
     
+
     
     
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>hnxydq</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://hnxydq.github.io/2018/10/02/Dubbo的动态编译/" title="Dubbo的动态编译">https://hnxydq.github.io/2018/10/02/Dubbo的动态编译/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/源码分析/" rel="tag"># 源码分析</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/02/Dubbo之Spi机制分析/" rel="next" title="Dubbo之Spi机制分析">
+                <i class="fa fa-chevron-left"></i> Dubbo之Spi机制分析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/10/03/Dubbo服务发布原理/" rel="prev" title="Dubbo服务发布原理">
+                Dubbo服务发布原理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
   </div>
 
 
@@ -414,17 +572,8 @@
       
 
       
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            文章目录
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            站点概览
-          </li>
-        </ul>
-      
 
-      <section class="site-overview-wrap sidebar-panel">
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -538,22 +687,6 @@
         </div>
       </section>
 
-      
-      <!--noindex-->
-        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-              
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#董强"><span class="nav-number">1.</span> <span class="nav-text">董强</span></a></li></ol></div>
-            
-
-          </div>
-        </section>
-      <!--/noindex-->
       
 
       
