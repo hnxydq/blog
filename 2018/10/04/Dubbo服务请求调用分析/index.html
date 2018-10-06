@@ -108,16 +108,20 @@
 
 
 
-  <meta name="description" content="Nothing lasts forever">
-<meta property="og:type" content="website">
-<meta property="og:title" content="闲来偶记">
-<meta property="og:url" content="https://hnxydq.github.io/archives/index.html">
+  <meta name="description" content="接下来分析Consumer的请求调用原理。以运行方式启动provider，以debug模式启动consumer。 我们在DemoConsumer类中打断点作为起点来跟踪具体的调用： 1234567891011121314151617181920public class DemoAction &amp;#123;    private DemoService demoService;    public v">
+<meta name="keywords" content="源码分析">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Dubbo请求调用分析">
+<meta property="og:url" content="https://hnxydq.github.io/2018/10/04/Dubbo服务请求调用分析/index.html">
 <meta property="og:site_name" content="闲来偶记">
-<meta property="og:description" content="Nothing lasts forever">
+<meta property="og:description" content="接下来分析Consumer的请求调用原理。以运行方式启动provider，以debug模式启动consumer。 我们在DemoConsumer类中打断点作为起点来跟踪具体的调用： 1234567891011121314151617181920public class DemoAction &amp;#123;    private DemoService demoService;    public v">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://hnxydq.github.io/2018/10/04/Dubbo服务请求调用分析/cluster_invoker.png">
+<meta property="og:updated_time" content="2018-10-04T14:13:00.708Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="闲来偶记">
-<meta name="twitter:description" content="Nothing lasts forever">
+<meta name="twitter:title" content="Dubbo请求调用分析">
+<meta name="twitter:description" content="接下来分析Consumer的请求调用原理。以运行方式启动provider，以debug模式启动consumer。 我们在DemoConsumer类中打断点作为起点来跟踪具体的调用： 1234567891011121314151617181920public class DemoAction &amp;#123;    private DemoService demoService;    public v">
+<meta name="twitter:image" content="https://hnxydq.github.io/2018/10/04/Dubbo服务请求调用分析/cluster_invoker.png">
 
 
 
@@ -126,7 +130,7 @@
 
 
 
-  <link rel="canonical" href="https://hnxydq.github.io/archives/"/>
+  <link rel="canonical" href="https://hnxydq.github.io/2018/10/04/Dubbo服务请求调用分析/"/>
 
 
 
@@ -136,7 +140,7 @@
   };
 </script>
 
-  <title>归档 | 闲来偶记</title>
+  <title>Dubbo请求调用分析 | 闲来偶记</title>
   
 
 
@@ -183,7 +187,7 @@
     
   
 
-  <div class="container sidebar-position-left page-archive">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -228,7 +232,7 @@
         
         
           
-          <li class="menu-item menu-item-archives menu-item-active">
+          <li class="menu-item menu-item-archives">
     <a href="/archives/" rel="section">
       <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
   </li>
@@ -272,28 +276,6 @@
 
   
     
-
-    
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-    
-
-  
-
 
   
 
@@ -342,339 +324,228 @@
           <div id="content" class="content">
             
 
-  
-  
-  
-  <div class="post-block archive">
-    <div id="posts" class="posts-collapse">
-      <span class="archive-move-on"></span>
+  <div id="posts" class="posts-expand">
+    
 
-      
-      <span class="archive-page-counter">
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://hnxydq.github.io/2018/10/04/Dubbo服务请求调用分析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="hnxydq">
+      <meta itemprop="description" content="Nothing lasts forever">
+      <meta itemprop="image" content="/images/logo.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="闲来偶记">
+    </span>
+
+    
+      <header class="post-header">
+
         
         
+          <h2 class="post-title" itemprop="name headline">Dubbo请求调用分析
+              
+            
+          </h2>
         
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-10-04 21:43:35 / 修改时间：22:13:00" itemprop="dateCreated datePublished" datetime="2018-10-04T21:43:35+08:00">2018-10-04</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
           
-        
-        嗯..! 目前共计 8 篇日志。 继续努力。
-      </span>
-      
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Dubbo/" itemprop="url" rel="index"><span itemprop="name">Dubbo</span></a></span>
 
-      
-
-        
-        
-        
-
-        
+                
+                
+              
+            </span>
           
-          <div class="collection-title">
-            <h2 class="archive-year" id="archive-year-2018">2018</h2>
-          </div>
-        
-        
 
-        
+          
+            
+          
 
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+          
+          
 
-      <h3 class="post-title">
-        
-            <a class="post-title-link" href="/2018/10/06/Dubbo网络通信编解码/" itemprop="url">
-              
-                <span itemprop="name">Dubbo网络通信-编解码</span>
-              
-            </a>
-        
-      </h3>
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             阅读次数： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-10-06T22:00:34+08:00"
-              content="2018-10-06" >
-          10-06
-        </time>
-      </div>
+          
 
-    </header>
-  </article>
+          
 
+        </div>
+      </header>
+    
 
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h3 class="post-title">
-        
-            <a class="post-title-link" href="/2018/10/05/dubbo如何实现SOA的服务降级/" itemprop="url">
-              
-                <span itemprop="name">Dubbo如何实现SOA的服务降级</span>
-              
-            </a>
-        
-      </h3>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-10-05T22:26:03+08:00"
-              content="2018-10-05" >
-          10-05
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
       
 
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h3 class="post-title">
-        
-            <a class="post-title-link" href="/2018/10/05/Dubbo服务响应执行过程/" itemprop="url">
-              
-                <span itemprop="name">Dubbo服务响应执行过程</span>
-              
-            </a>
-        
-      </h3>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-10-05T13:27:32+08:00"
-              content="2018-10-05" >
-          10-05
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
+      
+        <p>接下来分析Consumer的请求调用原理。以运行方式启动provider，以debug模式启动consumer。</p>
+<p>我们在DemoConsumer类中打断点作为起点来跟踪具体的调用：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DemoAction</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> DemoService demoService;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setDemoService</span><span class="params">(DemoService demoService)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.demoService = demoService;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">start</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; Integer.MAX_VALUE; i++) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                String hello = demoService.sayHello(<span class="string">"world"</span> + i);</span><br><span class="line">                System.out.println(<span class="string">"["</span> + <span class="keyword">new</span> SimpleDateFormat(<span class="string">"HH:mm:ss"</span>).format(<span class="keyword">new</span> Date()) + <span class="string">"] "</span> + hello);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">            Thread.sleep(<span class="number">2000</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在idea中断点状态下查看表达式的值，可以使用Alt+F8查看。</p>
+<p>从demoService.sayHello()说起：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">demoService.sayHello(<span class="string">"world"</span> + i)</span><br><span class="line">--&gt;InvokerInvocationHandler.invoke</span><br><span class="line">  --&gt;invoker.invoke(<span class="keyword">new</span> RpcInvocation(method, args))</span><br><span class="line">    --&gt;RpcInvocation<span class="comment">//所有请求参数都会转换为RpcInvocation</span></span><br><span class="line">    --&gt;MockClusterInvoker.invoke(Invocation invocation) <span class="comment">//1.进入集群</span></span><br><span class="line">      --&gt;invoker.invoke(invocation)  <span class="comment">//RpcInvocation [methodName=sayHello, parameterTypes=[class java.lang.String], arguments=[world0], attachments=&#123;&#125;]</span></span><br><span class="line">        --&gt;AbstractClusterInvoker.invoke(<span class="keyword">final</span> Invocation invocation)</span><br><span class="line">          --&gt;list(invocation)</span><br><span class="line">            --&gt;directory.list(invocation)<span class="comment">//2.进入目录查找   从this.methodInvokerMap里面查找一个Invoker</span></span><br><span class="line">              --&gt;AbstractDirectory.list(Invocation invocation)</span><br><span class="line">                --&gt;doList(invocation)</span><br><span class="line">                  --&gt;RegistryDirectory.doList(Invocation invocation)<span class="comment">// 从this.methodInvokerMap里面查找一个Invoker</span></span><br><span class="line">                --&gt;router.route <span class="comment">//3.进入路由 </span></span><br><span class="line">                  --&gt;MockInvokersSelector.route(<span class="keyword">final</span> List&lt;Invoker&lt;T&gt;&gt; invokers, URL url, <span class="keyword">final</span> Invocation invocation)</span><br><span class="line">                    --&gt;getNormalInvokers(<span class="keyword">final</span> List&lt;Invoker&lt;T&gt;&gt; invokers)</span><br><span class="line">          --&gt;ExtensionLoader.getExtensionLoader(LoadBalance.class).getExtension(<span class="string">"roundrobin"</span>)</span><br><span class="line">          --&gt;<span class="keyword">return</span> doInvoke(invocation, invokers, loadbalance)</span><br><span class="line">            --&gt;FailoverClusterInvoker.doInvoke(Invocation invocation, <span class="keyword">final</span> List&lt;Invoker&lt;T&gt;&gt; invokers, LoadBalance loadbalance)</span><br><span class="line">              --&gt;select(loadbalance, invocation, copyinvokers, invoked) <span class="comment">//4.进入负载均衡</span></span><br><span class="line">                --&gt;AbstractClusterInvoker.select <span class="comment">//使用loadbalance选择invoker. a)先lb选择，如果在selected列表中 或者 不可用且做检验时，进入下一步(重选),否则直接返回&lt;/br&gt; * b)重选验证规则：selected &gt; available .保证重选出的结果尽量不在select中，并且是可用的</span></span><br><span class="line">                  --&gt;doselect(loadbalance, invocation, invokers, selected) <span class="comment">////如果只有一个invoker，则直接返回该invoker；如果有两个则退化成轮训；如果更多则做负载均衡如下：</span></span><br><span class="line">                    --&gt;loadbalance.select</span><br><span class="line">                      --&gt;AbstractLoadBalance.select  <span class="comment">//默认做loadbalance</span></span><br><span class="line">                        --&gt;doSelect</span><br><span class="line">                          --&gt;RoundRobinLoadBalance.doSelect </span><br><span class="line">                            --&gt;<span class="keyword">return</span> invokers.get(currentSequence % length)<span class="comment">//取模轮循</span></span><br><span class="line">              --&gt;Result result = invoker.invoke(invocation)</span><br></pre></td></tr></table></figure>
+<p>集群容错的基本流程：</p>
+<p><img src="/2018/10/04/Dubbo服务请求调用分析/cluster_invoker.png" alt="cluster_invoker"></p>
+<h3 id="Directory目录服务"><a href="#Directory目录服务" class="headerlink" title="Directory目录服务"></a>Directory目录服务</h3><p>包含StaticDirectory和RegistryDirectory。</p>
+<p>其中StaticDirectory是静态的，invoker是固定的；RegistryDirectory是注册目录服务，它的Invoker集合来自于ZK，实现了NotifyListener接口，实现了void notify(List<url> urls);方法，整个过程维护了一个重要变量methodInvokerMap，该map是数据的来源，同时也是notify (RegostryDirectory#notify())的重要操作对象，重点是写操作。（通过doList来完成读操作，通过notify完成写操作, 写操作参照消费者服务引用分析listener.notify(categoryList)）;</url></p>
+<p>下面是读操作：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">--&gt;directory.list<span class="comment">//2.进入目录查找   从this.methodInvokerMap里面查找一个Invoker</span></span><br><span class="line">  --&gt;AbstractDirectory.list</span><br><span class="line">    --&gt;doList(invocation) <span class="comment">//完成读操作</span></span><br><span class="line">      --&gt;RegistryDirectory.doList<span class="comment">// 从this.methodInvokerMap里面查找一个Invoker</span></span><br><span class="line">    --&gt;router.route <span class="comment">//3.进入路由 </span></span><br><span class="line">      --&gt;MockInvokersSelector.route</span><br><span class="line">        --&gt;getNormalInvokers</span><br></pre></td></tr></table></figure>
+<h3 id="Router路由规则"><a href="#Router路由规则" class="headerlink" title="Router路由规则"></a>Router路由规则</h3><h3 id="Cluster"><a href="#Cluster" class="headerlink" title="Cluster"></a>Cluster</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">FailoverCluster：（默认）失败转移，当出现失败，重试其它服务器，通常用于读操作，但重试会带来更长延迟。</span><br><span class="line">FailfastCluster：快速失败，只发起一次调用，失败立即报错，通常用于非幂等性的写操作。</span><br><span class="line">FailbackCluster：失败自动恢复，后台记录失败请求，定时重发，通常用于消息通知操作。</span><br><span class="line">FailsafeCluster：失败安全，出现异常时，直接忽略，通常用于写入审计日志等操作。</span><br><span class="line">ForkingCluster：并行调用，只要一个成功即返回，通常用于实时性要求较高的操作，但需要浪费更多服务资源。</span><br><span class="line">BroadcastCluster: 广播调用。遍历所有Invokers,逐个调用每个调用catch住异常不影响其他invoker调用</span><br><span class="line">MergeableCluster: 分组聚合，按组合并返回结果，比如菜单服务，接口一样，但有多种实现，用group区分，现在消费方需从每种group中调用一次返回结果，合并结果返回，这样就可以实现聚合菜单项。</span><br><span class="line">AvailableCluster:获取可用的调用。遍历所有Invokers判断Invoker.isAvalible,只要一个有为true直接调用返回，不管成不成功。</span><br></pre></td></tr></table></figure>
+<h3 id="LoadBalance"><a href="#LoadBalance" class="headerlink" title="LoadBalance"></a>LoadBalance</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">RandomLoadBalance：随机，按权重设置随机概率。在一个截面上碰撞的概率高，但调用量越大分布越均匀，而且按概率使用权重后也比较均匀，有利于动态调整提供者权重。</span><br><span class="line">RoundRobinLoadBalance：轮循，按公约后的权重设置轮循比率。存在慢的提供者累积请求问题，比如：第二台机器很慢，但没挂，当请求调到第二台时就卡在那，久而久之，所有请求都卡在调到第二台上。</span><br><span class="line">LeastActiveLoadBalance：最少活跃调用数，相同活跃数的随机，活跃数指调用前后计数差。使慢的提供者收到更少请求，因为越慢的提供者的调用前后计数差会越大。</span><br><span class="line">ConsistentHashLoadBalance：一致性Hash，相同参数的请求总是发到同一提供者。当某一台提供者挂时，原本发往该提供者的请求，基于虚拟节点，平摊到其它提供者，不会引起剧烈变动。</span><br></pre></td></tr></table></figure>
+<p>接着前面的调用流程继续分析，FailoverClusterInvoker#doInvoke(Invocation invocation, final List&lt;Invoker<t>&gt; invokers, LoadBalance loadbalance)：</t></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">--&gt;Result result = invoker.invoke(invocation)</span><br><span class="line">  --&gt;InvokerWrapper.invoke(Invocation invocation)</span><br><span class="line">    --&gt;ProtocolFilterWrapper.buildInvokerChain() #invoke()</span><br><span class="line">    	--&gt; ConsumerContextFilter.invoke()</span><br><span class="line">    	  --&gt;ProtocolFilterWrapper.buildInvokerChain() #invoke()</span><br><span class="line">       	--&gt;MonitorFilter.invoke</span><br><span class="line">       	  --&gt;ProtocolFilterWrapper.buildInvokerChain() #invoke()</span><br><span class="line">    		    --&gt;FutureFilter.invoke</span><br><span class="line">    		      --&gt;ListenerInvokerWrapper.invoke</span><br><span class="line">    		        --&gt;AbstractInvoker.invoke</span><br><span class="line">    		          --&gt;doInvoke(invocation)</span><br><span class="line">    				   --&gt;DubboInvoker.doInvoke</span><br><span class="line">    				     --&gt;ReferenceCountExchangeClient.sendRequest</span><br><span class="line">    				       --&gt;HeaderExchangeClient.request</span><br><span class="line">    				         --&gt;HeaderExchangeChannel.request</span><br><span class="line">    				           --&gt;AbstractPeer.send(Object message)</span><br><span class="line">      						--&gt;NettyChannel.send</span><br><span class="line">      						  --&gt;ChannelFuture future = channel.writeAndFlush(message);<span class="comment">//通过netty的channel发送网络数据</span></span><br></pre></td></tr></table></figure>
 
       
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h3 class="post-title">
-        
-            <a class="post-title-link" href="/2018/10/04/Dubbo服务请求调用分析/" itemprop="url">
-              
-                <span itemprop="name">Dubbo请求调用分析</span>
-              
-            </a>
-        
-      </h3>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-10-04T21:43:35+08:00"
-              content="2018-10-04" >
-          10-04
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h3 class="post-title">
-        
-            <a class="post-title-link" href="/2018/10/04/Dubbo服务引用的设计原理/" itemprop="url">
-              
-                <span itemprop="name">Dubbo服务引用的设计原理</span>
-              
-            </a>
-        
-      </h3>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-10-04T16:35:38+08:00"
-              content="2018-10-04" >
-          10-04
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h3 class="post-title">
-        
-            <a class="post-title-link" href="/2018/10/03/Dubbo服务发布原理/" itemprop="url">
-              
-                <span itemprop="name">Dubbo服务发布原理</span>
-              
-            </a>
-        
-      </h3>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-10-03T21:45:52+08:00"
-              content="2018-10-03" >
-          10-03
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h3 class="post-title">
-        
-            <a class="post-title-link" href="/2018/10/02/Dubbo的动态编译/" itemprop="url">
-              
-                <span itemprop="name">Dubbo的动态编译</span>
-              
-            </a>
-        
-      </h3>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-10-02T21:33:20+08:00"
-              content="2018-10-02" >
-          10-02
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h3 class="post-title">
-        
-            <a class="post-title-link" href="/2018/10/02/Dubbo之Spi机制分析/" itemprop="url">
-              
-                <span itemprop="name">Dubbo之Spi机制分析</span>
-              
-            </a>
-        
-      </h3>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-10-02T16:47:38+08:00"
-              content="2018-10-02" >
-          10-02
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
     </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>hnxydq</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://hnxydq.github.io/2018/10/04/Dubbo服务请求调用分析/" title="Dubbo请求调用分析">https://hnxydq.github.io/2018/10/04/Dubbo服务请求调用分析/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/源码分析/" rel="tag"># 源码分析</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/04/Dubbo服务引用的设计原理/" rel="next" title="Dubbo服务引用的设计原理">
+                <i class="fa fa-chevron-left"></i> Dubbo服务引用的设计原理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/10/05/Dubbo服务响应执行过程/" rel="prev" title="Dubbo服务响应执行过程">
+                Dubbo服务响应执行过程 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
+  </article>
 
-  
 
+  </div>
 
 
           </div>
           
+
+  
+
+
 
         </div>
         
@@ -695,8 +566,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -810,6 +690,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Directory目录服务"><span class="nav-number">1.</span> <span class="nav-text">Directory目录服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Router路由规则"><span class="nav-number">2.</span> <span class="nav-text">Router路由规则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Cluster"><span class="nav-number">3.</span> <span class="nav-text">Cluster</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LoadBalance"><span class="nav-number">4.</span> <span class="nav-text">LoadBalance</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -955,6 +851,10 @@
   
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
 
   
 

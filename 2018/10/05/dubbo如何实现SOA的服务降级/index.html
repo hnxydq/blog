@@ -108,16 +108,18 @@
 
 
 
-  <meta name="description" content="Nothing lasts forever">
-<meta property="og:type" content="website">
-<meta property="og:title" content="闲来偶记">
-<meta property="og:url" content="https://hnxydq.github.io/archives/index.html">
+  <meta name="description" content="服务开关对于在线商城，在下单交易环节，可能需要调用A、B、C三个接口来完成，其中A和B是必须的，C只是附加功能（如在下单的时候推荐相关商品或push消息），可有可无，在平时系统没有压力，容量充足的情况下，调用下没问题，但是在类似618店庆之类的大促环节，系统满负荷运行，此时完全可以不调用C接口，怎么实现这个功能？ 改代码？—加个服务开关 服务降级使用dubbo在进行服务调用时，可能由于各种原因（服">
+<meta name="keywords" content="源码分析">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Dubbo如何实现SOA的服务降级">
+<meta property="og:url" content="https://hnxydq.github.io/2018/10/05/dubbo如何实现SOA的服务降级/index.html">
 <meta property="og:site_name" content="闲来偶记">
-<meta property="og:description" content="Nothing lasts forever">
+<meta property="og:description" content="服务开关对于在线商城，在下单交易环节，可能需要调用A、B、C三个接口来完成，其中A和B是必须的，C只是附加功能（如在下单的时候推荐相关商品或push消息），可有可无，在平时系统没有压力，容量充足的情况下，调用下没问题，但是在类似618店庆之类的大促环节，系统满负荷运行，此时完全可以不调用C接口，怎么实现这个功能？ 改代码？—加个服务开关 服务降级使用dubbo在进行服务调用时，可能由于各种原因（服">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-10-05T14:32:45.198Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="闲来偶记">
-<meta name="twitter:description" content="Nothing lasts forever">
+<meta name="twitter:title" content="Dubbo如何实现SOA的服务降级">
+<meta name="twitter:description" content="服务开关对于在线商城，在下单交易环节，可能需要调用A、B、C三个接口来完成，其中A和B是必须的，C只是附加功能（如在下单的时候推荐相关商品或push消息），可有可无，在平时系统没有压力，容量充足的情况下，调用下没问题，但是在类似618店庆之类的大促环节，系统满负荷运行，此时完全可以不调用C接口，怎么实现这个功能？ 改代码？—加个服务开关 服务降级使用dubbo在进行服务调用时，可能由于各种原因（服">
 
 
 
@@ -126,7 +128,7 @@
 
 
 
-  <link rel="canonical" href="https://hnxydq.github.io/archives/"/>
+  <link rel="canonical" href="https://hnxydq.github.io/2018/10/05/dubbo如何实现SOA的服务降级/"/>
 
 
 
@@ -136,7 +138,7 @@
   };
 </script>
 
-  <title>归档 | 闲来偶记</title>
+  <title>Dubbo如何实现SOA的服务降级 | 闲来偶记</title>
   
 
 
@@ -183,7 +185,7 @@
     
   
 
-  <div class="container sidebar-position-left page-archive">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -228,7 +230,7 @@
         
         
           
-          <li class="menu-item menu-item-archives menu-item-active">
+          <li class="menu-item menu-item-archives">
     <a href="/archives/" rel="section">
       <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
   </li>
@@ -272,28 +274,6 @@
 
   
     
-
-    
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-    
-
-  
-
 
   
 
@@ -342,339 +322,243 @@
           <div id="content" class="content">
             
 
-  
-  
-  
-  <div class="post-block archive">
-    <div id="posts" class="posts-collapse">
-      <span class="archive-move-on"></span>
+  <div id="posts" class="posts-expand">
+    
 
-      
-      <span class="archive-page-counter">
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://hnxydq.github.io/2018/10/05/dubbo如何实现SOA的服务降级/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="hnxydq">
+      <meta itemprop="description" content="Nothing lasts forever">
+      <meta itemprop="image" content="/images/logo.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="闲来偶记">
+    </span>
+
+    
+      <header class="post-header">
+
         
         
+          <h2 class="post-title" itemprop="name headline">Dubbo如何实现SOA的服务降级
+              
+            
+          </h2>
         
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-10-05 22:26:03 / 修改时间：22:32:45" itemprop="dateCreated datePublished" datetime="2018-10-05T22:26:03+08:00">2018-10-05</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
           
-        
-        嗯..! 目前共计 8 篇日志。 继续努力。
-      </span>
-      
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Dubbo/" itemprop="url" rel="index"><span itemprop="name">Dubbo</span></a></span>
 
-      
-
-        
-        
-        
-
-        
+                
+                
+              
+            </span>
           
-          <div class="collection-title">
-            <h2 class="archive-year" id="archive-year-2018">2018</h2>
-          </div>
-        
-        
 
-        
+          
+            
+          
 
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+          
+          
 
-      <h3 class="post-title">
-        
-            <a class="post-title-link" href="/2018/10/06/Dubbo网络通信编解码/" itemprop="url">
-              
-                <span itemprop="name">Dubbo网络通信-编解码</span>
-              
-            </a>
-        
-      </h3>
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             阅读次数： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-10-06T22:00:34+08:00"
-              content="2018-10-06" >
-          10-06
-        </time>
-      </div>
+          
 
-    </header>
-  </article>
+          
 
+        </div>
+      </header>
+    
 
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h3 class="post-title">
-        
-            <a class="post-title-link" href="/2018/10/05/dubbo如何实现SOA的服务降级/" itemprop="url">
-              
-                <span itemprop="name">Dubbo如何实现SOA的服务降级</span>
-              
-            </a>
-        
-      </h3>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-10-05T22:26:03+08:00"
-              content="2018-10-05" >
-          10-05
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
       
 
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h3 class="post-title">
-        
-            <a class="post-title-link" href="/2018/10/05/Dubbo服务响应执行过程/" itemprop="url">
-              
-                <span itemprop="name">Dubbo服务响应执行过程</span>
-              
-            </a>
-        
-      </h3>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-10-05T13:27:32+08:00"
-              content="2018-10-05" >
-          10-05
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
+      
+        <h3 id="服务开关"><a href="#服务开关" class="headerlink" title="服务开关"></a>服务开关</h3><p>对于在线商城，在下单交易环节，可能需要调用A、B、C三个接口来完成，其中A和B是必须的，C只是附加功能（如在下单的时候推荐相关商品或push消息），可有可无，在平时系统没有压力，容量充足的情况下，调用下没问题，但是在类似618店庆之类的大促环节，系统满负荷运行，此时完全可以不调用C接口，怎么实现这个功能？ 改代码？—加个服务开关</p>
+<h3 id="服务降级"><a href="#服务降级" class="headerlink" title="服务降级"></a>服务降级</h3><p>使用dubbo在进行服务调用时，可能由于各种原因（服务器宕机/网络超时/并发数太高等），调用中就会出现RpcException，调用失败。</p>
+<p>服务降级就是当服务器压力剧增的情况下，根据当前业务情况及流量对一些服务和页面有策略的降级，以此释放服务器资源以保证核心任务的正常运行。换句话说，就是指在由于非业务异常导致的服务不可用时，可以返回默认值，避免异常影响主业务的处理。</p>
+<ol>
+<li>屏蔽：在大促，促销活动的可预知情况下，例如双11活动。采用直接屏蔽接口访问。（可知）</li>
+</ol>
+<p>​        mock=force:returnnull</p>
+<p>   2.容错：当系统出现非业务异常(比如并发数太高导致超时，网络异常等)时，不对该接口进行处理。（不可知）</p>
+<p>​      mock=fail:returnnull</p>
+<h3 id="Dubbo服务降级配置"><a href="#Dubbo服务降级配置" class="headerlink" title="Dubbo服务降级配置"></a>Dubbo服务降级配置</h3><h4 id="mock配置方式"><a href="#mock配置方式" class="headerlink" title="mock配置方式"></a>mock配置方式</h4><p>dubbo官方文档上使用一个mock配置，实现服务降级。mock只在出现非业务异常(比如超时，网络异常等)时执行。mock的配置支持两种，一种为boolean值，默认的为false。如果配置为true，则缺省使用mock类名，即类名+Mock后缀；另外一种则是配置”return null”，可以很简单的忽略掉异常。</p>
+<p>mock配置在调用方，服务降级不需要对服务方配置产生修改。下面举个例子说明，mock的配置：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**接口定义*/</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">FooService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">doSomething</span><span class="params">(String str)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**实现类*/</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FooServiceImpl</span> <span class="keyword">implements</span> <span class="title">FooService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">doSomething</span><span class="params">(String str)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"service invoke: doSomething ,"</span> + str);</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"service invoke: doSomething"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>provider.xml:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span><br><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">"http://www.springframework.org/schema/beans"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span> <span class="attr">xmlns:dubbo</span>=<span class="string">"http://code.alibabatech.com/schema/dubbo"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://www.springframework.org/schema/beans        http://www.springframework.org/schema/beans/spring-beans.xsd        http://code.alibabatech.com/schema/dubbo        http://code.alibabatech.com/schema/dubbo/dubbo.xsd"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- 提供方应用信息，用于计算依赖关系 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dubbo:application</span> <span class="attr">name</span>=<span class="string">"hello-world-app"</span> /&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 使用multicast广播注册中心暴露服务地址 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dubbo:registry</span> <span class="attr">address</span>=<span class="string">"zookeeper://127.0.0.1:2181"</span> /&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 用dubbo协议在20880端口暴露服务 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dubbo:protocol</span> <span class="attr">name</span>=<span class="string">"dubbo"</span> <span class="attr">port</span>=<span class="string">"20880"</span> /&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 声明需要暴露的服务接口 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dubbo:service</span> <span class="attr">interface</span>=<span class="string">"com.test.service.FooService"</span> <span class="attr">ref</span>=<span class="string">"fooServerImpl"</span> <span class="attr">timeout</span>=<span class="string">"10000"</span> /&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 和本地bean一样实现服务 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"fooServerImpl"</span> <span class="attr">class</span>=<span class="string">"com.test.serviceimpl.FooServerImpl"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>consumer.xml</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span><br><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">"http://www.springframework.org/schema/beans"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xmlns:dubbo</span>=<span class="string">"http://code.alibabatech.com/schema/dubbo"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://www.springframework.org/schema/beans        http://www.springframework.org/schema/beans/spring-beans.xsd        http://code.alibabatech.com/schema/dubbo        http://code.alibabatech.com/schema/dubbo/dubbo.xsd"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- 消费方应用名，用于计算依赖关系，不是匹配条件，不要与提供方一样 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dubbo:application</span> <span class="attr">name</span>=<span class="string">"dubbo-consumer"</span>  /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dubbo:registry</span> <span class="attr">address</span>=<span class="string">"zookeeper://127.0.0.1:2181"</span> /&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 生成远程服务代理，可以和本地bean一样使用demoService --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dubbo:reference</span> <span class="attr">id</span>=<span class="string">"fooService"</span> <span class="attr">interface</span>=<span class="string">"com.test.service.FooService"</span>  <span class="attr">timeout</span>=<span class="string">"10000"</span> <span class="attr">check</span>=<span class="string">"false"</span> <span class="attr">mock</span>=<span class="string">"return null"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dubbo:reference</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>测试在调用端调用服务两个方法，当服务端正常启动时，程序获得正常返回值；当服务提供方没有启动（模拟服务不可用状态）,调用方依然正常运行，调用doSomething获取返回值时null。</p>
+<h4 id="mock实现接口方式"><a href="#mock实现接口方式" class="headerlink" title="mock实现接口方式"></a>mock实现接口方式</h4><p>上面在<code>&lt;dubbuo:reference&gt;</code> 中配置<code>mock=&quot;retrun null&quot;</code> 的配置，在服务降级时会对service中的所有方法做统一处理，即都返回null。但是有的时候我们需要一些方法在服务不可用时告诉我们一些其他信息，以便做其他处理。如更新/删除等。要有较好的区分，可以通过以下的方式。</p>
+<p>配置<code>mock=&quot;true&quot;</code> ,同时实现mock接口，类名要注意命名规范：接口名+Mock后缀。此时如果调用失败会调用Mock实现。mock实现需要保证有无参的构造方法。</p>
+<p>配置mock=”true”的情况，对于上面的例子即在FooService的同个路径下，添加类FooServiceMock，实现如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FooServiceMock</span> <span class="keyword">implements</span> <span class="title">FooService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">doSomething</span><span class="params">(String str)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="Dubbo服务降级具体实现"><a href="#Dubbo服务降级具体实现" class="headerlink" title="Dubbo服务降级具体实现"></a>Dubbo服务降级具体实现</h4><p>通过Dubbo的Filter对Dubbo进行扩展，从而使得每次服务发起调用都可以得到监控，从而可以监控每次服务的调用。</p>
+<p><u>对自动判断服务提供端是否宕机：通过一个记录器对每个方法出现RPC异常进行记录，并且可以配置在某个时间段内连续出现都少个异常可判定为服务提供端出现了宕机，从而进行服务降级。</u></p>
+<p><u>自动恢复远程服务调用：通过配置检查服务的频率来达到定时检查远程服务是否可用，从而去除服务降级。</u></p>
+<h4 id="判断降级相关配置"><a href="#判断降级相关配置" class="headerlink" title="判断降级相关配置"></a>判断降级相关配置</h4><p>降级配置分配为应用级别，接口级别，方法级别 。dubbo相关参数配置在dubbo.properties中,默认是在classpath根目录，也可以通过-Ddubbo.properties.file来指定该文件路径。</p>
+<p>1.应用级别</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">dubbo.reference.default.break.limit:该参数是配置一个方法在指定时间内出现多少个异常则判断为服务提供方宕机 </span><br><span class="line">dubbo.reference.default.retry.frequency:该参数配置重试频率，比如配置100，则表示没出现一百次异常则尝试一下远程服务是否可用 </span><br><span class="line">dubbo.reference.circuit.break:服务降级功能开关，默认是false，表示关闭状态，可以配置为true</span><br></pre></td></tr></table></figure>
+<p>2.接口级别</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">dubbo.reference.fullinterfacename.break.limit:同上面dubbo.reference.default−break−limit，指定某个接口dubbo.reference.&#123;fullinterfacename&#125;.retry.frequency:同上面 </span><br><span class="line">dubbo.reference.$&#123;fullinterfacename&#125;.circuit.break:服务降级功能开关，默认是false，表示关闭状态，可以配置为true</span><br></pre></td></tr></table></figure>
+<p>3.方法级别</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">dubbo.reference.fullinterfacename.&#123;methodName&#125;.break.limit:同上面dubbo.reference.default-break-limit，指定某个接口的某个方法 </span><br><span class="line">dubbo.reference.fullinterfacename.&#123;methodName&#125;.retry.frequency:同上面dubbo.reference.default-retry-frequency，指定某个接口的某个方法 </span><br><span class="line">dubbo.reference.fullinterfacename.&#123;methodName&#125;.circuit.break:服务降级功能开关，默认是false，表示关闭状态，可以配置为true</span><br></pre></td></tr></table></figure>
 
       
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h3 class="post-title">
-        
-            <a class="post-title-link" href="/2018/10/04/Dubbo服务请求调用分析/" itemprop="url">
-              
-                <span itemprop="name">Dubbo请求调用分析</span>
-              
-            </a>
-        
-      </h3>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-10-04T21:43:35+08:00"
-              content="2018-10-04" >
-          10-04
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h3 class="post-title">
-        
-            <a class="post-title-link" href="/2018/10/04/Dubbo服务引用的设计原理/" itemprop="url">
-              
-                <span itemprop="name">Dubbo服务引用的设计原理</span>
-              
-            </a>
-        
-      </h3>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-10-04T16:35:38+08:00"
-              content="2018-10-04" >
-          10-04
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h3 class="post-title">
-        
-            <a class="post-title-link" href="/2018/10/03/Dubbo服务发布原理/" itemprop="url">
-              
-                <span itemprop="name">Dubbo服务发布原理</span>
-              
-            </a>
-        
-      </h3>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-10-03T21:45:52+08:00"
-              content="2018-10-03" >
-          10-03
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h3 class="post-title">
-        
-            <a class="post-title-link" href="/2018/10/02/Dubbo的动态编译/" itemprop="url">
-              
-                <span itemprop="name">Dubbo的动态编译</span>
-              
-            </a>
-        
-      </h3>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-10-02T21:33:20+08:00"
-              content="2018-10-02" >
-          10-02
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h3 class="post-title">
-        
-            <a class="post-title-link" href="/2018/10/02/Dubbo之Spi机制分析/" itemprop="url">
-              
-                <span itemprop="name">Dubbo之Spi机制分析</span>
-              
-            </a>
-        
-      </h3>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-10-02T16:47:38+08:00"
-              content="2018-10-02" >
-          10-02
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
     </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>hnxydq</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://hnxydq.github.io/2018/10/05/dubbo如何实现SOA的服务降级/" title="Dubbo如何实现SOA的服务降级">https://hnxydq.github.io/2018/10/05/dubbo如何实现SOA的服务降级/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/源码分析/" rel="tag"># 源码分析</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/05/Dubbo服务响应执行过程/" rel="next" title="Dubbo服务响应执行过程">
+                <i class="fa fa-chevron-left"></i> Dubbo服务响应执行过程
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/10/06/Dubbo网络通信编解码/" rel="prev" title="Dubbo网络通信-编解码">
+                Dubbo网络通信-编解码 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
+  </article>
 
-  
 
+  </div>
 
 
           </div>
           
+
+  
+
+
 
         </div>
         
@@ -695,8 +579,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -810,6 +703,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#服务开关"><span class="nav-number">1.</span> <span class="nav-text">服务开关</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#服务降级"><span class="nav-number">2.</span> <span class="nav-text">服务降级</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Dubbo服务降级配置"><span class="nav-number">3.</span> <span class="nav-text">Dubbo服务降级配置</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#mock配置方式"><span class="nav-number">3.1.</span> <span class="nav-text">mock配置方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mock实现接口方式"><span class="nav-number">3.2.</span> <span class="nav-text">mock实现接口方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Dubbo服务降级具体实现"><span class="nav-number">3.3.</span> <span class="nav-text">Dubbo服务降级具体实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#判断降级相关配置"><span class="nav-number">3.4.</span> <span class="nav-text">判断降级相关配置</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -955,6 +864,10 @@
   
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
 
   
 
